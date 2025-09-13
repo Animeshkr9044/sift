@@ -1,0 +1,20 @@
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated reports
+swiggy_report/
+zomato_report/
+blinkit_report/
+
+# Root-level generated files
+topic_review_details_*.csv
+trend_report_*.json
+trend_report_*.pdf
+
+# Databases
+data/*.db

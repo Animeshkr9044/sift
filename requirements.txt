@@ -1,0 +1,8 @@
+openai
+pandas
+sentence-transformers
+scikit-learn
+numpy
+google-play-scraper
+tqdm
+fpdf2
