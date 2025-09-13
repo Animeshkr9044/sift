@@ -15,6 +15,6 @@ blinkit_report/
 topic_review_details_*.csv
 trend_report_*.json
 trend_report_*.pdf
-
+*.json
 # Databases
 data/*.db
