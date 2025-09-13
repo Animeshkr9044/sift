@@ -2,7 +2,7 @@
 
 import argparse
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from concurrent.futures import ProcessPoolExecutor
 from collections import Counter
 from tqdm import tqdm
@@ -92,8 +92,8 @@ def main():
     parser = argparse.ArgumentParser(description="Run the PulseGen review analysis pipeline.")
     parser.add_argument("--url", type=str, help="A Google Play Store URL to analyze a single app.")
     parser.add_argument("--app_name", type=str, help="The name of the app if providing a URL.")
-    parser.add_argument("--start-date", type=str, required=True, help="Start date for analysis (YYYY-MM-DD).")
-    parser.add_argument("--end-date", type=str, required=True, help="End date for analysis (YYYY-MM-DD).")
+    parser.add_argument("--start-date", type=str, help="Start date for analysis (YYYY-MM-DD). Defaults to 30 days ago.")
+    parser.add_argument("--end-date", type=str, help="End date for analysis (YYYY-MM-DD). Defaults to today.")
     args = parser.parse_args()
 
     if not config.OPENAI_API_KEY:
@@ -103,8 +103,16 @@ def main():
     # Initialize the master database
     db_manager.initialize_master_database(config.MASTER_DB_PATH)
     
-    start_date_obj = datetime.strptime(args.start_date, "%Y-%m-%d")
-    end_date_obj = datetime.strptime(args.end_date, "%Y-%m-%d")
+    # Set default date range to the last 30 days if not provided
+    if args.end_date:
+        end_date_obj = datetime.strptime(args.end_date, "%Y-%m-%d")
+    else:
+        end_date_obj = datetime.now()
+
+    if args.start_date:
+        start_date_obj = datetime.strptime(args.start_date, "%Y-%m-%d")
+    else:
+        start_date_obj = end_date_obj - timedelta(days=30)
 
     if args.url:
         # Analyze a single app from the URL

@@ -44,7 +44,7 @@ The project uses the OpenAI API for analysis. You need to provide your API key.
 
 ### 3. Running the Analysis
 
-PulseGen can be run in two modes:
+By default, PulseGen analyzes reviews from the last 30 days. You can also provide a custom date range.
 
 #### A) Analyze All Apps in `config.py`
 
@@ -52,7 +52,6 @@ You can define a list of apps to analyze in the `config.py` file.
 
 ```python
 # config.py
-
 APPS_TO_ANALYZE = [
     {
         "app_name": "Zomato",
@@ -63,18 +62,32 @@ APPS_TO_ANALYZE = [
 ]
 ```
 
-To run the pipeline for all configured apps, execute:
+*   **To analyze the last 30 days (default):**
 
-```bash
-python app.py
-```
+    ```bash
+    python app.py
+    ```
+
+*   **To analyze a custom date range:**
+
+    ```bash
+    python app.py --start-date "2025-07-01" --end-date "2025-07-31"
+    ```
 
 #### B) Analyze a Single App via URL
 
-You can also analyze any app directly by providing its Google Play Store URL as a command-line argument.
+You can also analyze any app directly by providing its Google Play Store URL.
 
-```bash
-python app.py --url "https://play.google.com/store/apps/details?id=com.application.zomato" --app_name "Zomato"
-```
+*   **To analyze the last 30 days (default):**
 
-This will scrape the reviews for the specified app, store them in the master database, and generate the analysis reports in a new directory inside `output/`.
+    ```bash
+    python app.py --url "https://play.google.com/store/apps/details?id=com.application.zomato" --app_name "Zomato"
+    ```
+
+*   **To analyze a custom date range:**
+
+    ```bash
+    python app.py --url "https://play.google.com/store/apps/details?id=com.application.zomato" --app_name "Zomato" --start-date "2025-07-01" --end-date "2025-07-31"
+    ```
+
+This will scrape and analyze the reviews, storing the results in a new directory inside `output/`.
