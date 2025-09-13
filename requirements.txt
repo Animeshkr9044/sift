@@ -5,4 +5,5 @@ scikit-learn
 numpy
 google-play-scraper
 tqdm
+python-dotenv
 fpdf2

@@ -1,22 +1,29 @@
-# App Review Analysis Project
+# PulseGen: App Review Analysis Engine
 
-This project contains a suite of tools to download, store, and analyze Google Play Store reviews for various food delivery apps.
+PulseGen is a powerful, modular pipeline designed to scrape, store, and analyze Google Play Store reviews. It uses AI to perform topic modeling and trend analysis, generating insightful reports in JSON, CSV, and PDF formats.
 
 ## Project Structure
 
-- `data/`: Contains all data files, including the raw JSON reviews and the SQLite databases.
-- `scripts/`: Contains all Python scripts for data collection, database loading, and analysis.
-- `tests/`: Contains experimental and test scripts.
-- `requirements.txt`: Lists all the Python dependencies required for this project.
+- **`pulse_engine/`**: The core Python package containing all the logic.
+  - `analysis/`: AI agent and text preprocessing.
+  - `data_ingestion/`: Live data scraper and database loader.
+  - `database/`: Master database management.
+  - `reporting/`: Report generation (JSON, CSV, PDF).
+- **`data/`**: Stores the master SQLite database (`master_reviews.db`).
+- **`output/`**: Contains all generated analysis reports, organized by app.
+- **`app.py`**: The main entry point to run the entire pipeline.
+- **`config.py`**: Main configuration file for defining apps to analyze and other settings.
+- **`.env`**: Stores your secret API keys (e.g., OpenAI).
+- **`requirements.txt`**: Lists all the Python dependencies.
 
 ## Setup and Usage
 
 ### 1. Environment Setup
 
-It is recommended to use a Python virtual environment.
+It is highly recommended to use a Python virtual environment.
 
 ```bash
-# Create and activate a virtual environment (optional but recommended)
+# Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate
 
@@ -24,42 +31,50 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Download Reviews
+### 2. Configure API Key
 
-To download reviews for an app, run the corresponding script from the root directory:
+The project uses the OpenAI API for analysis. You need to provide your API key.
 
-```bash
-# Download Swiggy reviews
-python scripts/get_reviews.py
+1.  Create a file named `.env` in the root of the project.
+2.  Add your OpenAI API key to the `.env` file like this:
 
-# Download Blinkit reviews
-python scripts/get_blinkit_reviews.py
+    ```
+    OPENAI_API_KEY="your-secret-api-key-here"
+    ```
 
-# Download Zomato reviews
-python scripts/get_zomato_reviews.py
+### 3. Running the Analysis
+
+PulseGen can be run in two modes:
+
+#### A) Analyze All Apps in `config.py`
+
+You can define a list of apps to analyze in the `config.py` file.
+
+```python
+# config.py
+
+APPS_TO_ANALYZE = [
+    {
+        "app_name": "Zomato",
+        "app_id": "com.application.zomato",
+        "output_dir": "output/zomato_report"
+    },
+    # Add more apps here
+]
 ```
 
-### 3. Load Reviews into Database
-
-After downloading the JSON files, load them into their respective SQLite databases:
+To run the pipeline for all configured apps, execute:
 
 ```bash
-python scripts/load_to_db.py
-python scripts/load_blinkit_to_db.py
-python scripts/load_zomato_to_db.py
+python app.py
 ```
 
-### 4. Analyze Reviews
+#### B) Analyze a Single App via URL
 
-To run the topic modeling and trend analysis, you need to configure your OpenAI API key.
-
-1.  Open `scripts/review_analysis.py`.
-2.  In the `main()` function, replace `"your-api-key"` with your actual OpenAI key.
-
-Then, run the script:
+You can also analyze any app directly by providing its Google Play Store URL as a command-line argument.
 
 ```bash
-python scripts/review_analysis.py
+python app.py --url "https://play.google.com/store/apps/details?id=com.application.zomato" --app_name "Zomato"
 ```
 
-This will generate a trend report for the Swiggy reviews and save it in the root directory.
+This will scrape the reviews for the specified app, store them in the master database, and generate the analysis reports in a new directory inside `output/`.
