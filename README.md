@@ -91,3 +91,10 @@ You can also analyze any app directly by providing its Google Play Store URL.
     ```
 
 This will scrape and analyze the reviews, storing the results in a new directory inside `output/`.
+
+
+python app.py --url "https://play.google.com/store/apps/details?id=in.swiggy.android.instamart&hl=en_IN" --app_name "Instamart" --start-date "2025-07-01" --end-date "2025-07-10"
+
+
+Video Demonstration Link 
+    https://drive.google.com/drive/folders/1Is8L_8c_qsMUjla-s-7EPMj5X7uQcoiP?usp=sharing
