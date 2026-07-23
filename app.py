@@ -89,7 +89,7 @@ def run_analysis_for_app(app_config, start_date, end_date):
 
 def main():
     """Main entry point for the application."""
-    parser = argparse.ArgumentParser(description="Run the ReviewPulse review analysis pipeline.")
+    parser = argparse.ArgumentParser(description="Run the Sift review analysis pipeline.")
     parser.add_argument("--url", type=str, help="A Google Play Store URL to analyze a single app.")
     parser.add_argument("--app_name", type=str, help="The name of the app if providing a URL.")
     parser.add_argument("--start-date", type=str, help="Start date for analysis (YYYY-MM-DD). Defaults to 30 days ago.")

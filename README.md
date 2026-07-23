@@ -1,6 +1,6 @@
-# ReviewPulse — App Review Analysis Engine
+# Sift — App Review Analysis Engine
 
-ReviewPulse is a modular CLI pipeline that scrapes Google Play Store reviews, stores
+Sift is a modular CLI pipeline that scrapes Google Play Store reviews, stores
 them in a local database, and uses an LLM plus sentence embeddings to surface the
 main topics and complaint trends over time. It generates daily trend reports in
 JSON, CSV, and PDF.
@@ -22,7 +22,7 @@ product and support teams actually need:
 - Is a problem *new* this week, or has it always been there?
 - Did a complaint spike on a specific day — after a release or an outage?
 
-**ReviewPulse answers those questions automatically.** Point it at an app, give it a
+**Sift answers those questions automatically.** Point it at an app, give it a
 date range, and it returns a ranked, day-by-day breakdown of complaint themes —
 plus the exact reviews behind every number.
 
@@ -114,7 +114,7 @@ cp .env.example .env
 
 ## Usage
 
-By default ReviewPulse analyzes the last 30 days. Reports land in `output/`.
+By default Sift analyzes the last 30 days. Reports land in `output/`.
 
 **Analyze all apps defined in `config.py`:**
 
