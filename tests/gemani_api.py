@@ -1,6 +1,8 @@
+import os
 import requests
 
-GEMINI_API_KEY = "REDACTED-ROTATED-KEY"
+# Load key from environment — never hardcode secrets.
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 
 url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
