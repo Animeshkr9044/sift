@@ -21,8 +21,6 @@ Explore a real run (Swiggy, Jul 2025) — no install needed:
 | 📊 **[Trend Dashboard](https://animeshkr9044.github.io/sift/)** | Top complaint themes, a topic × day heatmap, and the real reviews behind each number. |
 | 🔍 **[Label Quality Audit](https://animeshkr9044.github.io/sift/label-audit.html)** | LLM-as-judge scoring of every topic label — accuracy, confusions, and where the model got it wrong. |
 
-**Video walkthrough:** [Google Drive](https://drive.google.com/drive/folders/1Is8L_8c_qsMUjla-s-7EPMj5X7uQcoiP?usp=sharing)
-
 ---
 
 ## What is this?
