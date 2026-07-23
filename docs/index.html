@@ -1,0 +1,304 @@
+<title>Swiggy Review Pulse — Jul 2025</title>
+<style>
+  :root {
+    --ground: #FAF7F2;
+    --surface: #FFFFFF;
+    --surface-2: #F4EFE8;
+    --ink: #221C18;
+    --muted: #726858;
+    --faint: #9C917F;
+    --border: #E9E1D6;
+    --accent: #B5411A;
+    --accent-soft: #C7683C;
+    --heat-base: #FBF4EC;
+    --heat-peak: #A8391A;
+    --pos: #4B7A46;
+    --shadow: 0 1px 2px rgba(40,28,16,.04), 0 6px 20px rgba(40,28,16,.06);
+    --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #17130F;
+      --surface: #211B16;
+      --surface-2: #2A231C;
+      --ink: #F3EBE0;
+      --muted: #B3A493;
+      --faint: #7E7261;
+      --border: #362D24;
+      --accent: #F0873C;
+      --accent-soft: #E0763190;
+      --heat-base: #241C15;
+      --heat-peak: #F0873C;
+      --pos: #7CB173;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #FAF7F2; --surface: #FFFFFF; --surface-2: #F4EFE8; --ink: #221C18;
+    --muted: #726858; --faint: #9C917F; --border: #E9E1D6; --accent: #B5411A;
+    --accent-soft: #C7683C; --heat-base: #FBF4EC; --heat-peak: #A8391A; --pos: #4B7A46;
+    --shadow: 0 1px 2px rgba(40,28,16,.04), 0 6px 20px rgba(40,28,16,.06);
+  }
+  :root[data-theme="dark"] {
+    --ground: #17130F; --surface: #211B16; --surface-2: #2A231C; --ink: #F3EBE0;
+    --muted: #B3A493; --faint: #7E7261; --border: #362D24; --accent: #F0873C;
+    --accent-soft: #E0763190; --heat-base: #241C15; --heat-peak: #F0873C; --pos: #7CB173;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--sans); line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  header { margin-bottom: 36px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .eyebrow::before { content:""; width: 22px; height: 2px; background: var(--accent); display:inline-block; }
+  h1 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(30px, 5vw, 46px);
+    line-height: 1.05; margin: 0 0 12px; text-wrap: balance; letter-spacing: -.01em;
+  }
+  .sub { color: var(--muted); font-size: 15px; max-width: 62ch; margin: 0; }
+  .sub b { color: var(--ink); font-weight: 600; }
+
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 32px 0 44px; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px 18px 16px; box-shadow: var(--shadow);
+  }
+  .tile .k { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin: 0 0 8px; }
+  .tile .v { font-family: var(--serif); font-size: 34px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+  .tile .n { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+
+  section { margin-bottom: 46px; }
+  h2 {
+    font-family: var(--serif); font-size: 21px; font-weight: 600; margin: 0 0 4px;
+    letter-spacing: -.01em;
+  }
+  .caption { color: var(--muted); font-size: 13.5px; margin: 0 0 20px; }
+
+  /* bars */
+  .bars { display: flex; flex-direction: column; gap: 9px; }
+  .bar-row {
+    display: grid; grid-template-columns: 170px 1fr 48px; align-items: center; gap: 14px;
+    cursor: pointer; padding: 4px 6px; border-radius: 9px; border: 1px solid transparent;
+    transition: background .15s, border-color .15s;
+  }
+  .bar-row:hover { background: var(--surface-2); }
+  .bar-row.sel { background: var(--surface-2); border-color: var(--border); }
+  .bar-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .bar-label { font-size: 13.5px; text-align: right; color: var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bar-track { height: 22px; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
+  .bar-fill {
+    height: 100%; background: var(--accent); border-radius: 5px;
+    transform-origin: left; transition: width .6s cubic-bezier(.2,.7,.2,1);
+  }
+  .bar-val { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
+
+  /* heatmap */
+  .heat-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+  table.heat { border-collapse: separate; border-spacing: 3px; padding: 14px; width: 100%; }
+  table.heat th {
+    font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--faint);
+    text-transform: uppercase; letter-spacing: .05em; padding: 4px 6px; text-align: center; white-space: nowrap;
+  }
+  table.heat th.rowh { text-align: right; font-family: var(--sans); font-size: 12.5px; text-transform: none; letter-spacing: 0; color: var(--ink); min-width: 150px; cursor: pointer; }
+  table.heat th.rowh:hover { color: var(--accent); }
+  table.heat td {
+    width: 58px; height: 34px; text-align: center; border-radius: 6px;
+    font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums;
+    color: var(--ink); position: relative; cursor: default;
+  }
+  table.heat td[data-v]:hover { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .tt {
+    position: fixed; z-index: 20; background: var(--ink); color: var(--ground);
+    font-family: var(--sans); font-size: 12px; padding: 6px 9px; border-radius: 7px;
+    pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .12s; white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  }
+  .tt b { font-family: var(--mono); }
+
+  /* drill */
+  .drill { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; box-shadow: var(--shadow); }
+  .drill-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
+  .drill-head h3 { font-family: var(--serif); font-size: 22px; margin: 0; font-weight: 600; }
+  .drill-head .tot { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .drill-head .tot b { color: var(--accent); font-size: 17px; }
+  .spark { display: flex; align-items: flex-end; gap: 5px; height: 46px; margin: 16px 0 20px; }
+  .spark .s { flex: 1; background: var(--accent-soft); border-radius: 3px 3px 0 0; min-height: 3px; position: relative; }
+  .spark .s span { position: absolute; top: -16px; left: 0; right: 0; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--faint); }
+  .spark .lab { text-align:center; }
+  .spark-x { display: flex; gap: 5px; margin: -14px 0 22px; }
+  .spark-x div { flex: 1; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--faint); }
+  .rev-h { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin: 0 0 12px; }
+  .rev { display: flex; flex-direction: column; gap: 10px; }
+  .rev q {
+    display: block; background: var(--surface-2); border-left: 3px solid var(--accent);
+    padding: 11px 14px; border-radius: 0 9px 9px 0; font-size: 13.5px; color: var(--ink); quotes: none;
+  }
+  .empty { color: var(--faint); font-size: 13px; font-style: italic; }
+
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; }
+  footer code { font-family: var(--mono); background: var(--surface-2); padding: 1px 6px; border-radius: 5px; color: var(--muted); }
+
+  @media (max-width: 720px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .bar-row { grid-template-columns: 120px 1fr 40px; }
+    .bar-label { font-size: 12.5px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <nav style="display:flex;gap:18px;font-family:var(--mono);font-size:12px;margin-bottom:26px;">
+    <a href="index.html" style="color:var(--accent);text-decoration:none;font-weight:600;">Trend Dashboard</a>
+    <a href="label-audit.html" style="color:var(--muted);text-decoration:none;">Label Quality Audit →</a>
+  </nav>
+  <header>
+    <p class="eyebrow">Sift · App Review Analysis</p>
+    <h1>Swiggy Review Pulse</h1>
+    <p class="sub">What Google&nbsp;Play users complained about — <b>Jul&nbsp;17–22, 2025</b>. Reviews scraped across 5 languages, topics extracted by GPT&#8209;4o&#8209;mini and clustered into <b>17 themes</b>. Click any topic to read real reviews behind the number.</p>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section>
+    <h2>Top complaint themes</h2>
+    <p class="caption">Total mentions across the 6&#8209;day window. Click a bar to drill in.</p>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section>
+    <h2>Daily trend</h2>
+    <p class="caption">Mentions per theme per day. Darker&nbsp;=&nbsp;more complaints. Hover a cell for the count; click a theme name to drill in.</p>
+    <div class="heat-scroll">
+      <table class="heat" id="heat"></table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Behind the numbers</h2>
+    <p class="caption">Representative reviews for the selected theme.</p>
+    <div class="drill" id="drill"></div>
+  </section>
+
+  <footer>
+    Source: <code>google-play-scraper</code> → SQLite → GPT&#8209;4o&#8209;mini topic extraction + MiniLM clustering → trend report.
+    1,197 reviews analyzed · in.swiggy.android · generated by Sift. Sample of a public&#8209;data demo pipeline.
+  </footer>
+</div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+const DATA = {"dates":["2025-07-17","2025-07-18","2025-07-19","2025-07-20","2025-07-21","2025-07-22"],
+"trends":{"Delivery Issues":{"2025-07-17":28,"2025-07-18":27,"2025-07-19":42,"2025-07-20":53,"2025-07-21":39,"2025-07-22":25},"Customer Service Issues":{"2025-07-17":30,"2025-07-18":38,"2025-07-19":45,"2025-07-20":42,"2025-07-21":29,"2025-07-22":22},"Feedback":{"2025-07-17":27,"2025-07-18":29,"2025-07-19":30,"2025-07-20":33,"2025-07-21":29,"2025-07-22":24},"Pricing":{"2025-07-17":23,"2025-07-18":24,"2025-07-19":21,"2025-07-20":10,"2025-07-21":22,"2025-07-22":24},"Payment Issues":{"2025-07-17":19,"2025-07-18":15,"2025-07-19":11,"2025-07-20":23,"2025-07-21":16,"2025-07-22":13},"App Performance":{"2025-07-17":11,"2025-07-18":10,"2025-07-19":19,"2025-07-20":12,"2025-07-21":11,"2025-07-22":8},"Food Quality":{"2025-07-17":12,"2025-07-18":14,"2025-07-19":8,"2025-07-20":9,"2025-07-21":17,"2025-07-22":11},"Order Issues":{"2025-07-17":5,"2025-07-18":5,"2025-07-19":9,"2025-07-20":6,"2025-07-21":5,"2025-07-22":6},"General Feedback":{"2025-07-17":0,"2025-07-18":1,"2025-07-19":1,"2025-07-20":8,"2025-07-21":1,"2025-07-22":5},"Service Requests":{"2025-07-17":0,"2025-07-18":0,"2025-07-19":0,"2025-07-20":1,"2025-07-21":0,"2025-07-22":3},"App Improvement Requests":{"2025-07-17":0,"2025-07-18":1,"2025-07-19":0,"2025-07-20":0,"2025-07-21":0,"2025-07-22":1},"Location Issues":{"2025-07-17":0,"2025-07-18":1,"2025-07-19":1,"2025-07-20":0,"2025-07-21":0,"2025-07-22":0},"Product Requests":{"2025-07-17":0,"2025-07-18":0,"2025-07-19":1,"2025-07-20":1,"2025-07-21":0,"2025-07-22":0},"Delivery Quality":{"2025-07-17":0,"2025-07-18":0,"2025-07-19":0,"2025-07-20":2,"2025-07-21":0,"2025-07-22":0},"Service Issues":{"2025-07-17":0,"2025-07-18":0,"2025-07-19":1,"2025-07-20":0,"2025-07-21":0,"2025-07-22":0},"Offers Requests":{"2025-07-17":0,"2025-07-18":1,"2025-07-19":0,"2025-07-20":0,"2025-07-21":0,"2025-07-22":0},"Policy Feedback":{"2025-07-17":1,"2025-07-18":0,"2025-07-19":0,"2025-07-20":0,"2025-07-21":0,"2025-07-22":0}},
+"samples":{"Feedback":["it is the best app than anyother food delivery app","exceptional experience especially in metro cities.","very good app ,prise & service very fast","its very good delivery partner, on time pickup and delivery."],"Food Quality":["good service of swiggy good quality","easy to find delicious food and on time food","last time i got rotten green leafy vegetable i asked for a refund but they told me on ur next order u will get a coupon for that amount but till now i didn't get any coupon","the food taste is very good"],"Pricing":["why are you taking so much highh cancellation fee that's disgusting just trying to earn moree even after i have swiggy membership poor experience poor application poor guidlines","u guys are really horrible..250+ for a food bro don't supply food who wants food at 250","not good fake for coupons didn't liked","discount and offers are not much available also product range is low"],"Customer Service Issues":["don't recommend to any one .... worst service they are giving .... they charged whole payment amount as cancellation feee such worst thing is that ... no any costumer service support are available","i am extremely disappointed with the customer service provided. there is no contact number to reach out for urgent issues, and the replies on email are completely unhelpful","worst services they are offering no option to call support chat bot is not understand your concern","i suggest you rather order from other food delivery platforms it's better to go out yourself rather than ordering from swiggy . never gonna use this app again."],"Payment Issues":["swiggy sabse bekar hai agar aap se swiggy se dhokhe se koi order ho gya to swiggy wale 100% charge lagate hain","very much dissatisfied about cancellation policy.","such worst experience ever. i have placed a order and cancelled within a min due to location changes. they have charged my entire food cost which 824 as a cancellation charge","i wont use this again my money was debited while transaction was falied and i still didn't get any refund ."],"Order Issues":["wrong food dileverd low packing material very bad experience.","maine order galti se kar diya 1 minute me maine swiggy helpline par call kiya inhone koi help nhi ki","i have not order preparing by mistake","orders are missing , wrong orders and stale vegetables are being delivered. when i raised a complaint they asked to wait"],"Delivery Issues":["food has not delivered on time . if we cancel the order we have to pay full amount to swiggy. chat system is super . if ask anything they send mail to support team","bad experience i have ordered show fake time it gona 1 hr but showing only 10 min","too late last my order","horrible experience orders are not delivered on time delivery executive many times have very unprofessional behavior"],"App Performance":["the dumbest app for food delivery. i wanted to abort the order so i pressed the back button before making the payment and still the order was placed","good very easy and lite to use","my swiggy application not working","very disappointed due to my instamart is not working past 2 months"],"General Feedback":["swiggy vs zomato zomato is really swiggy is not really","tu hai tau main hun","couldnot get flash sales ever","this app is just a scam"],"Policy Feedback":["uninstalled .... allowing to selling beef on app"],"App Improvement Requests":["once any order is placed there should be an option to view what was ordered and quantity so that any amendments can be made","your coupons and discounts are very good, which is why i use this app. make a little modification in it"],"Location Issues":["not available in my area","bad idea for this location"],"Offers Requests":["more offers on every order"],"Service Issues":["not service available on my location but zomato give me deleviry on my location. plz solve this problem as soon as possible."],"Product Requests":["avail sachets ,small packs of products","good service best price best quality but i request add more small trader's company big network"],"Delivery Quality":["nice delivery and crt timing","good app in delivery"],"Service Requests":["still have to expand delivery area like kanbargi and all","hyy swiggy please please please aap niwari me bhi food diliver karne lago....","swiggy instant food is a great app, but sadly it's not available in ara, bhojpur (bihar). please expand your service here soon","everything is good but please share the rider contact number when he reached to the restaurant"]}};
+
+const totals = {};
+for (const t in DATA.trends) totals[t] = Object.values(DATA.trends[t]).reduce((a,b)=>a+b,0);
+const ranked = Object.keys(DATA.trends).filter(t=>totals[t]>0).sort((a,b)=>totals[b]-totals[a]);
+const maxTotal = totals[ranked[0]];
+let maxCell = 0;
+for (const t in DATA.trends) for (const d of DATA.dates) maxCell = Math.max(maxCell, DATA.trends[t][d]);
+
+// ---- color helpers ----
+function parseRGB(s){ const m = s.match(/(\d+\.?\d*)/g); return m ? m.slice(0,3).map(Number) : [0,0,0]; }
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function mix(a,b,t){ return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')})`; }
+function heat(v){
+  if (v<=0) return {bg:'var(--surface-2)', fg:'var(--faint)'};
+  const base = parseRGB(cssVar('--heat-base')), peak = parseRGB(cssVar('--heat-peak'));
+  const t = Math.pow(v/maxCell, 0.6);
+  return { bg: mix(base, peak, t), fg: t > 0.5 ? '#fff' : 'var(--ink)' };
+}
+
+// ---- tiles ----
+const totalMentions = Object.values(totals).reduce((a,b)=>a+b,0);
+document.getElementById('tiles').innerHTML = [
+  ['Reviews analyzed','1,197','5 languages · 6 days'],
+  ['Topic mentions', totalMentions.toLocaleString(),'across 17 themes'],
+  ['Top pain point','Delivery','214 mentions'],
+  ['Peak day','Jul 20','53 delivery complaints'],
+].map(([k,v,n])=>`<div class="tile"><p class="k">${k}</p><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
+
+// ---- bars ----
+const barTop = ranked.slice(0,10);
+document.getElementById('bars').innerHTML = barTop.map(t=>`
+  <div class="bar-row" tabindex="0" role="button" data-topic="${t}" aria-label="${t}, ${totals[t]} mentions">
+    <div class="bar-label" title="${t}">${t}</div>
+    <div class="bar-track"><div class="bar-fill" data-w="${(totals[t]/maxTotal*100).toFixed(1)}" style="width:0"></div></div>
+    <div class="bar-val">${totals[t]}</div>
+  </div>`).join('');
+requestAnimationFrame(()=>document.querySelectorAll('.bar-fill').forEach(f=>f.style.width=f.dataset.w+'%'));
+
+// ---- heatmap ----
+function fmtDay(d){ return new Date(d+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function buildHeat(){
+  const h = document.getElementById('heat');
+  let html = '<thead><tr><th class="rowh" style="text-align:right">Theme</th>' +
+    DATA.dates.map(d=>`<th>${fmtDay(d)}</th>`).join('') + '<th>Total</th></tr></thead><tbody>';
+  for (const t of ranked){
+    html += `<tr><th class="rowh" data-topic="${t}">${t}</th>`;
+    for (const d of DATA.dates){
+      const v = DATA.trends[t][d]; const c = heat(v);
+      html += `<td data-v="${v}" data-topic="${t}" data-day="${fmtDay(d)}" style="background:${c.bg};color:${c.fg}">${v||''}</td>`;
+    }
+    const ct = heat(0);
+    html += `<td style="background:transparent;color:var(--muted);font-weight:600">${totals[t]}</td></tr>`;
+  }
+  h.innerHTML = html + '</tbody>';
+  h.querySelectorAll('th.rowh[data-topic]').forEach(el=>el.onclick=()=>select(el.dataset.topic));
+  const tt = document.getElementById('tt');
+  h.querySelectorAll('td[data-v]').forEach(td=>{
+    td.onmouseenter = e=>{ tt.innerHTML = `${td.dataset.topic}<br>${td.dataset.day} · <b>${td.dataset.v}</b> mentions`; tt.style.opacity=1; };
+    td.onmousemove = e=>{ tt.style.left=(e.clientX+14)+'px'; tt.style.top=(e.clientY+14)+'px'; };
+    td.onmouseleave = ()=>{ tt.style.opacity=0; };
+  });
+}
+
+// ---- drill ----
+let selected = ranked[0];
+function select(t){
+  selected = t;
+  document.querySelectorAll('.bar-row').forEach(r=>r.classList.toggle('sel', r.dataset.topic===t));
+  const days = DATA.dates.map(d=>DATA.trends[t][d]);
+  const mx = Math.max(...days,1);
+  const spark = days.map((v,i)=>`<div class="s" style="height:${Math.max(6,v/mx*100)}%"><span>${v||''}</span></div>`).join('');
+  const sx = DATA.dates.map(d=>`<div>${fmtDay(d).replace(/^\w+ /,'')}</div>`).join('');
+  const revs = (DATA.samples[t]||[]);
+  const revHTML = revs.length
+    ? revs.map(r=>`<q>${r.replace(/</g,'&lt;')}</q>`).join('')
+    : '<p class="empty">No sampled reviews stored for this theme.</p>';
+  document.getElementById('drill').innerHTML = `
+    <div class="drill-head">
+      <h3>${t}</h3>
+      <div class="tot"><b>${totals[t]}</b> total mentions · peak ${Math.max(...days)}/day</div>
+    </div>
+    <div class="spark">${spark}</div>
+    <div class="spark-x">${sx}</div>
+    <p class="rev-h">Representative reviews</p>
+    <div class="rev">${revHTML}</div>`;
+}
+
+buildHeat();
+document.querySelectorAll('.bar-row').forEach(r=>{
+  r.onclick = ()=>select(r.dataset.topic);
+  r.onkeydown = e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); select(r.dataset.topic); } };
+});
+select(selected);
+
+// recolor heatmap on theme change
+const mo = new MutationObserver(buildHeat);
+mo.observe(document.documentElement, {attributes:true, attributeFilter:['data-theme','class','style']});
+if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', buildHeat);
+</script>
