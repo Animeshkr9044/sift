@@ -12,7 +12,16 @@ JSON, CSV, and PDF.
 > Built as a demo/portfolio project. Reviews are public Google Play data; be
 > mindful of Google's terms and of user privacy when scraping and sharing data.
 
-**Video demo:** https://drive.google.com/drive/folders/1Is8L_8c_qsMUjla-s-7EPMj5X7uQcoiP?usp=sharing
+### 🔗 Live demo
+
+Explore a real run (Swiggy, Jul 2025) — no install needed:
+
+| | |
+|---|---|
+| 📊 **[Trend Dashboard](https://animeshkr9044.github.io/sift/)** | Top complaint themes, a topic × day heatmap, and the real reviews behind each number. |
+| 🔍 **[Label Quality Audit](https://animeshkr9044.github.io/sift/label-audit.html)** | LLM-as-judge scoring of every topic label — accuracy, confusions, and where the model got it wrong. |
+
+**Video walkthrough:** [Google Drive](https://drive.google.com/drive/folders/1Is8L_8c_qsMUjla-s-7EPMj5X7uQcoiP?usp=sharing)
 
 ---
 
