@@ -1,6 +1,6 @@
-# PulseGen — App Review Analysis Engine
+# ReviewPulse — App Review Analysis Engine
 
-PulseGen is a modular CLI pipeline that scrapes Google Play Store reviews, stores
+ReviewPulse is a modular CLI pipeline that scrapes Google Play Store reviews, stores
 them in a local database, and uses an LLM plus sentence embeddings to surface the
 main topics and complaint trends over time. It generates daily trend reports in
 JSON, CSV, and PDF.
@@ -22,7 +22,7 @@ product and support teams actually need:
 - Is a problem *new* this week, or has it always been there?
 - Did a complaint spike on a specific day — after a release or an outage?
 
-**PulseGen answers those questions automatically.** Point it at an app, give it a
+**ReviewPulse answers those questions automatically.** Point it at an app, give it a
 date range, and it returns a ranked, day-by-day breakdown of complaint themes —
 plus the exact reviews behind every number.
 
@@ -86,6 +86,7 @@ pulse_engine/            Core package
   database/              SQLite schema & inserts
   analysis/              LLM agent + text preprocessing
   reporting/             JSON / CSV / PDF report generation
+  evaluation/            LLM-as-judge label quality scoring
 app.py                   CLI entry point (full pipeline)
 config.py                Apps to analyze + DB path; loads OPENAI_API_KEY
 data/                    Local SQLite DB + scraped JSON (git-ignored)
@@ -113,7 +114,7 @@ cp .env.example .env
 
 ## Usage
 
-By default PulseGen analyzes the last 30 days. Reports land in `output/`.
+By default ReviewPulse analyzes the last 30 days. Reports land in `output/`.
 
 **Analyze all apps defined in `config.py`:**
 
@@ -198,6 +199,31 @@ A real run over 1,197 Google Play reviews (`in.swiggy.android`), analyzed across
   sample reviews for Payment and Pricing.
 
 *Run cost ≈ **$0.03** in OpenAI usage (`gpt-4o-mini`).*
+
+## Evaluation (LLM-as-judge)
+
+How good are the topic labels? A second LLM pass grades every
+`(review, assigned_topic)` pair as **correct / partial / incorrect**, with a 1–5
+score and a suggested relabel — turning the run into a labeled evaluation dataset.
+
+```bash
+python scripts/evaluate_labels.py output/swiggy_report/topic_review_details_<range>.csv
+# stronger, unbiased judge:
+python scripts/evaluate_labels.py <csv> --judge-model gpt-4o --limit 300
+```
+
+Writes to `output/<app>_report/eval/`: a graded `.csv` + `.jsonl` dataset and a
+`_metrics.json` summary (accuracy, mean score, reassignment rate, per-topic
+accuracy).
+
+📊 **[Label quality audit dashboard](https://claude.ai/code/artifact/8e22caed-a048-4eef-bd05-6507e9043903)** — accuracy breakdown, common confusions, and every misjudged review with the judge's reasoning.
+
+On the Swiggy sample (400 reviews, self-judged by `gpt-4o-mini`): **72.5% correct,
+91% correct-or-partial**. Most errors are **taxonomy gaps** — missing *Cancellation*,
+*Refund*, and *Overall Experience* themes — not random noise.
+
+> ⚠️ When judge and labeler are the same model, accuracy is optimistically biased.
+> Use a stronger judge for a trustworthy benchmark.
 
 ## Tech stack
 
