@@ -1,0 +1,150 @@
+# Sift — Product Notebook
+
+> A living document. The top half is **reference** (kept current — what exists and how
+> it works). The bottom half is a **running log** (append-only — dated notes, ideas,
+> decisions). When you add a feature, update the reference *and* drop a log entry.
+
+**Repo:** https://github.com/Animeshkr9044/sift
+**Live demo:** [Trend Dashboard](https://animeshkr9044.github.io/sift/) · [Label Quality Audit](https://animeshkr9044.github.io/sift/label-audit.html)
+
+---
+
+## 1. What Sift is
+
+Sift turns thousands of raw Google Play reviews into a **"what's breaking and when"**
+report. Point it at an app + a date range; it returns a ranked, day-by-day breakdown
+of complaint themes, plus the exact reviews behind every number, and a quality score
+for its own labels.
+
+**Who it's for:** product / support / QA teams who can't read every review but need to
+know what users are angry about and whether a problem is new this week.
+
+---
+
+## 2. Architecture
+
+Five stages, one CLI. Data flows left to right; each stage is an independent module
+under `pulse_engine/`.
+
+```
+Play Store ──► scraper ──► SQLite ──► loader ──► agent (LLM) ──► generator ──► reports
+                                                    │
+                                          evaluation (LLM judge)
+```
+
+| Stage | Module | What it does | How / what it uses |
+|-------|--------|--------------|--------------------|
+| **1. Scrape** | `data_ingestion/scraper.py` | Pull every review in a date range | `google-play-scraper` (unofficial Play endpoints). 25-thread fan-out over 5 star-ratings × 5 languages; pages via continuation tokens until older than `start_date`; dedups by `reviewId`. |
+| **2. Store** | `database/db_manager.py` | Persist reviews locally | SQLite, two tables (`apps`, `reviews`). `INSERT OR IGNORE` → re-runs are incremental. |
+| **3. Load & sample** | `data_ingestion/loader.py` | Prep text for the LLM | pandas. Lowercase + strip emojis (`analysis/preprocessor.py`), drop <5-word reviews, sample ≤200/day for cost control. |
+| **4. Analyze** | `analysis/agent.py` | Assign + consolidate topics | `gpt-4o-mini` extracts a topic + type per review (batches of 20). `all-MiniLM-L6-v2` embeddings + cosine similarity (>0.75) merge near-duplicate topic names. A second LLM pass groups them into high-level themes. Days run in parallel (`ProcessPoolExecutor`). |
+| **5. Report** | `reporting/generator.py` | Emit the deliverables | Builds a topic × date trend table → JSON + CSV + landscape PDF (`fpdf2`). |
+| **Eval** | `evaluation/judge.py` | Grade the labels | Second LLM pass scores each `(review, topic)` as correct/partial/incorrect + 1–5 + suggested relabel → graded CSV/JSONL dataset + metrics. |
+
+**Entry point:** `app.py` — parses CLI args, resolves date range, runs the pipeline
+per app (from `config.py`) or for a single app via `--url`.
+
+---
+
+## 3. How to run
+
+```bash
+# setup
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env          # add OPENAI_API_KEY
+
+# analyze one app
+python app.py --url "https://play.google.com/store/apps/details?id=in.swiggy.android" \
+              --app_name "Swiggy" --start-date 2025-07-16 --end-date 2025-07-23
+
+# grade the labels
+python scripts/evaluate_labels.py output/swiggy_report/topic_review_details_<range>.csv
+```
+
+Outputs land in `output/<app>_report/` (reports) and `output/<app>_report/eval/`
+(graded dataset + metrics).
+
+---
+
+## 4. Tech stack
+
+| Concern | Choice | Why |
+|---------|--------|-----|
+| Scraping | `google-play-scraper` | No official API; this wraps Play's internal endpoints. No auth. |
+| LLM | OpenAI `gpt-4o-mini` | Cheap (~$0.03/app/week), good enough for topic tagging. |
+| Embeddings | `sentence-transformers` (MiniLM) | Local, free, fast topic dedup. |
+| Clustering | scikit-learn (cosine similarity) | Simple threshold merge. |
+| Storage | SQLite | Zero-setup, incremental re-runs. |
+| Reports | `fpdf2`, pandas | PDF/CSV/JSON. |
+| Dashboards | Static HTML (`docs/`), GitHub Pages | Self-contained, no backend. |
+
+---
+
+## 5. Known limitations
+
+- **Unofficial scraper** — breaks if Google changes endpoints; subject to throttling
+  (the slow "23/25" stalls on large pulls).
+- **No sentiment weighting** — "Feedback" mixes praise and complaints; ranking is by
+  raw mention count, not negativity.
+- **Taxonomy gaps** — the LLM judge showed missing themes: *Cancellation*, *Refund*,
+  *Overall Experience* (see the [audit](https://animeshkr9044.github.io/sift/label-audit.html)).
+- **Console trend-table bug** — `reporting/generator.py` `_display_trend_table` prints
+  zeros (wrong reindex axis). JSON/CSV/PDF are correct.
+- **Self-eval bias** — judge and labeler are the same model by default; accuracy is
+  optimistic. Use `--judge-model gpt-4o` for a real number.
+- **Static dashboards** — data is baked in per run, not auto-generated by the pipeline.
+- **Dates edge case** — first/last day of a range can drop if reviews are sparse.
+
+---
+
+## 6. Future scope / roadmap
+
+Ideas backlog — unordered, groomed as they mature. Move items into the log when done.
+
+### Near-term (fixes the audit surfaced)
+- [ ] Add missing seed topics: **Cancellation**, **Refund**, **Overall Experience** (`analysis/agent.py:16`).
+- [ ] Drop non-actionable praise instead of bucketing it as "Feedback".
+- [ ] Fix the console trend-table display bug.
+- [ ] Pin dependency versions (`requirements.txt`) — the `sentence-transformers` 5.x break cost a debugging cycle.
+
+### Product features
+- [ ] **Sentiment weighting** — reuse the stored star `score`; rank themes by negativity, not volume (per the MERIT paper).
+- [ ] **Emerging-issue detection** — flag themes that spike vs. their baseline (per IDEA/MERIT), not just totals.
+- [ ] **`--html` export** — have `generator.py` write the dashboard per run, so `docs/` auto-updates.
+- [ ] **Multi-app comparison** — Swiggy vs. Zomato vs. Blinkit on one view.
+- [ ] **iOS App Store** support (`app-store-scraper`).
+- [ ] **Alerting** — cron the pipeline; Slack/email when a theme spikes.
+- [ ] **Dev-reply analysis** — we store `replyContent`; measure response rate / latency.
+
+### Platform / infra
+- [ ] `pyproject.toml` + `uv` instead of `requirements.txt` + pip.
+- [ ] Incremental mode: `--no-scrape` to analyze what's already in SQLite.
+- [ ] Cost tracking: log `response.usage` and print $ spent per run.
+- [ ] Tests for the pipeline (currently only `tests/gemani_api.py`, an ad-hoc script).
+
+### Research directions
+- [ ] Replace/benchmark LLM topic extraction vs. classic topic models (LDA/biterm — the IDEA approach).
+- [ ] Build a gold labeled set from high-agreement judged rows → fine-tune a cheap classifier.
+
+---
+
+## 7. Product log
+
+> Append-only. Newest at the top. One entry per meaningful change or decision.
+> Format: `### YYYY-MM-DD — title` then what/why.
+
+### 2026-07-24 — Public release + LLM-as-judge
+- Made the repo public; purged a leaked Gemini key and 189MB of scraped JSON from git
+  history; added MIT license and `.env.example`.
+- Renamed the project **PulseGen → ReviewPulse → Sift** (repo slug `sift`).
+- Rewrote the README: overview, mermaid diagram, sample results, evaluation section.
+- Fixed a crash: `sentence-transformers` 5.x rejects numpy `StringArray` in `encode()`
+  → pass `.tolist()` (`analysis/agent.py`).
+- Ran the pipeline on Swiggy (Jul 17–22, 2025, 1,197 reviews). Top pain point:
+  Delivery Issues (214), spiking to 53 on Jul 20.
+- Built the **LLM-as-judge** eval module + a graded dataset. Self-judged accuracy
+  72.5% correct / 91% correct-or-partial. Errors are mostly taxonomy gaps.
+- Published two static dashboards to **GitHub Pages** (`docs/`, `.nojekyll`).
+
+<!-- Add your next entry above this line -->

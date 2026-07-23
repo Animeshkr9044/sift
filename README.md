@@ -241,6 +241,11 @@ On the Swiggy sample (400 reviews, self-judged by `gpt-4o-mini`): **72.5% correc
 OpenAI (`gpt-4o-mini`) · `sentence-transformers` (MiniLM) · scikit-learn ·
 pandas · `google-play-scraper` · SQLite · `fpdf2`
 
+## Docs
+
+- **[docs/NOTES.md](docs/NOTES.md)** — the product notebook: full architecture
+  reference, known limitations, roadmap, and a running dev log.
+
 ## License
 
 [MIT](LICENSE)
