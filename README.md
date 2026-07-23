@@ -5,6 +5,10 @@ them in a local database, and uses an LLM plus sentence embeddings to surface th
 main topics and complaint trends over time. It generates daily trend reports in
 JSON, CSV, and PDF.
 
+> **Why "Sift"?** Thousands of reviews land every week, most of them noise. The tool
+> *sifts* that flood down to the handful of signals that matter — what users are
+> actually complaining about, and when it started.
+
 > Built as a demo/portfolio project. Reviews are public Google Play data; be
 > mindful of Google's terms and of user privacy when scraping and sharing data.
 
