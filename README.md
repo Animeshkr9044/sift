@@ -12,13 +12,56 @@ JSON, CSV, and PDF.
 
 ---
 
+## What is this?
+
+Popular apps (Zomato, Swiggy, Blinkit) collect **thousands of Play Store reviews
+every week** — far too many to read by hand. Buried in that noise are the answers
+product and support teams actually need:
+
+- What are users complaining about most right now?
+- Is a problem *new* this week, or has it always been there?
+- Did a complaint spike on a specific day — after a release or an outage?
+
+**PulseGen answers those questions automatically.** Point it at an app, give it a
+date range, and it returns a ranked, day-by-day breakdown of complaint themes —
+plus the exact reviews behind every number.
+
+## What it does
+
+- **Scrapes** every Play Store review for an app in a date range — across 5 star
+  ratings and 5 Indian languages, in parallel.
+- **Stores** them in a local SQLite database so re-runs are incremental (no
+  re-fetching).
+- **Understands** each review with an LLM: assigns a topic (e.g. *Delivery Issues*,
+  *Payment Issues*) and a type (*complaint / request / compliment*).
+- **Groups** near-duplicate topics using sentence embeddings, then consolidates
+  them into a clean set of high-level themes.
+- **Reports** a topic × date trend table showing what users are unhappy about and
+  **when** — as JSON, CSV, and PDF.
+
+**In one line:** it turns thousands of raw app reviews into a "what's breaking and
+when" trend report. See [Sample results](#sample-results--swiggy-jul-1722-2025)
+for a real run.
+
 ## How it works
 
-```
-Google Play  ──►  scraper  ──►  SQLite (master_reviews.db)  ──►  loader
-                                                                    │
-                                                                    ▼
-   reports (JSON/CSV/PDF)  ◄──  generator  ◄──  AI agent (topic analysis)
+```mermaid
+flowchart LR
+    A[Google Play<br/>Store] -->|scraper| B[(SQLite<br/>master_reviews.db)]
+    B -->|loader:<br/>clean + sample| C[Daily review<br/>batches]
+    C -->|GPT-4o-mini| D[Topic per<br/>review]
+    D -->|MiniLM embeddings<br/>cosine similarity| E[Consolidated<br/>themes]
+    E -->|generator| F[Reports<br/>JSON · CSV · PDF]
+
+    subgraph Ingestion
+        A
+        B
+    end
+    subgraph AI Analysis
+        C
+        D
+        E
+    end
 ```
 
 1. **Scrape** — `data_ingestion/scraper.py` fetches reviews in parallel across
@@ -125,6 +168,36 @@ Each run produces, per app / date range:
 - `trend_report_<range>.pdf` — landscape trend table
 
 Sample PDFs are committed in `output/` as examples.
+
+## Sample results — Swiggy (Jul 17–22, 2025)
+
+A real run over 1,197 Google Play reviews (`in.swiggy.android`), analyzed across
+5 languages and consolidated into 17 themes.
+
+📊 **[Interactive dashboard](https://claude.ai/code/artifact/a0b6a635-bb39-4aa3-9937-562f8f0edcb6)** — heatmap, trends, and the real reviews behind each number.
+
+**Top complaint themes (6-day totals):**
+
+| Rank | Theme | Mentions |
+|------|-------|---------:|
+| 1 | Delivery Issues | 214 |
+| 2 | Customer Service Issues | 206 |
+| 3 | Feedback (mixed/positive) | 172 |
+| 4 | Pricing | 124 |
+| 5 | Payment Issues | 97 |
+| 6 | App Performance | 71 |
+| 7 | Food Quality | 71 |
+
+**What the trend surfaced:**
+
+- **Delivery Issues** spiked to **53 mentions on Jul 20** (vs ~27 baseline) — the
+  single largest daily signal in the window.
+- **Customer Service** stayed consistently high (30–45/day) — a chronic issue, not a spike.
+- Recurring complaint driver across themes: **cancellation fees charged on
+  near-instant cancellations** and **failed-payment refunds** — visible in the
+  sample reviews for Payment and Pricing.
+
+*Run cost ≈ **$0.03** in OpenAI usage (`gpt-4o-mini`).*
 
 ## Tech stack
 

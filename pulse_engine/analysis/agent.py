@@ -82,7 +82,7 @@ class ReviewAnalysisAgent:
         if not extracted_topics:
             return []
         df = pd.DataFrame(extracted_topics)
-        unique_topics = df['topic'].unique()
+        unique_topics = df['topic'].unique().tolist()
         topic_embeddings = self.embedding_model.encode(unique_topics)
         similarity_matrix = cosine_similarity(topic_embeddings)
         groups = {}
