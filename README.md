@@ -179,7 +179,7 @@ Sample PDFs are committed in `output/` as examples.
 A real run over 1,197 Google Play reviews (`in.swiggy.android`), analyzed across
 5 languages and consolidated into 17 themes.
 
-📊 **[Interactive dashboard](https://claude.ai/code/artifact/a0b6a635-bb39-4aa3-9937-562f8f0edcb6)** — heatmap, trends, and the real reviews behind each number.
+📊 **[Interactive dashboard](https://animeshkr9044.github.io/sift/)** — heatmap, trends, and the real reviews behind each number.
 
 **Top complaint themes (6-day totals):**
 
@@ -220,7 +220,7 @@ Writes to `output/<app>_report/eval/`: a graded `.csv` + `.jsonl` dataset and a
 `_metrics.json` summary (accuracy, mean score, reassignment rate, per-topic
 accuracy).
 
-📊 **[Label quality audit dashboard](https://claude.ai/code/artifact/8e22caed-a048-4eef-bd05-6507e9043903)** — accuracy breakdown, common confusions, and every misjudged review with the judge's reasoning.
+📊 **[Label quality audit dashboard](https://animeshkr9044.github.io/sift/label-audit.html)** — accuracy breakdown, common confusions, and every misjudged review with the judge's reasoning.
 
 On the Swiggy sample (400 reviews, self-judged by `gpt-4o-mini`): **72.5% correct,
 91% correct-or-partial**. Most errors are **taxonomy gaps** — missing *Cancellation*,
